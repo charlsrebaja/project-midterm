@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}Cipher Tools - Security System{% endblock %}
+
+{% block page_title %}Cipher Tools{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl shadow-lg p-6 text-white mb-8">
+        <h2 class="text-2xl font-bold mb-2">Encryption & Decryption Tools</h2>
+        <p class="opacity-90">Use various cipher algorithms to encrypt or decrypt your text</p>
+    </div>
+    
+    <!-- Cipher Tool Interface -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Input Section -->
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Input Text</h3>
+                <textarea id="inputText" 
+                          class="w-full h-40 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                          placeholder="Enter your text here..."></textarea>
+                
+                <!-- Cipher Selection -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Cipher</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="selectCipher('atbash')" 
+                                id="atbash-btn"
+                                class="cipher-btn px-4 py-2 border-2 border-purple-500 text-purple-600 rounded-lg hover:bg-purple-500 hover:text-white transition-colors">
+                            Atbash
+                        </button>
+                        <button onclick="selectCipher('caesar')" 
+                                id="caesar-btn"
+                                class="cipher-btn px-4 py-2 border-2 border-gray-300 text-gray-600 rounded-lg hover:bg-purple-500 hover:text-white hover:border-purple-500 transition-colors">
+                            Caesar
+                        </button>
+                        <button onclick="selectCipher('vigenere')" 
+                                id="vigenere-btn"
+                                class="cipher-btn px-4 py-2 border-2 border-gray-300 text-gray-600 rounded-lg hover:bg-purple-500 hover:text-white hover:border-purple-500 transition-colors">
+                            Vigenère
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Additional Parameters -->
+                <div id="caesar-params" class="mt-4 hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Caesar Shift Value</label>
+                    <input type="number" 
+                           id="caesarShift" 
+                           min="1" 
+                           max="25" 
+                           value="3"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                
+                <div id="vigenere-params" class="mt-4 hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Vigenère Key</label>
+                    <input type="text" 
+                           id="vigenereKey" 
+                           value="KEY"
+                           placeholder="Enter key (letters only)"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                
+                <!-- Mode Selection -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mode</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="selectMode('encrypt')" 
+                                id="encrypt-btn"
+                                class="mode-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                            <i class="fas fa-lock mr-2"></i>Encrypt
+                        </button>
+                        <button onclick="selectMode('decrypt')" 
+                                id="decrypt-btn"
+                                class="mode-btn px-4 py-2 border-2 border-gray-300 text-gray-600 rounded-lg hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors">
+                            <i class="fas fa-unlock mr-2"></i>Decrypt
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Process Button -->
+                <button onclick="processCipher()" 
+                        class="w-full mt-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-lg hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02]">
+                    <i class="fas fa-cogs mr-2"></i>Process Text
+                </button>
+            </div>
+            
+            <!-- Output Section -->
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Output Text</h3>
+                <textarea id="outputText" 
+                          class="w-full h-40 p-4 border border-gray-300 rounded-lg bg-gray-50 resize-none"
+                          placeholder="Processed text will appear here..."
+                          readonly></textarea>
+                
+                <!-- Copy Button -->
+                <button onclick="copyOutput()" 
+                        class="w-full mt-4 bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200">
+                    <i class="fas fa-copy mr-2"></i>Copy Output
+                </button>
+                
+                <!-- Clear Button -->
+                <button onclick="clearAll()" 
+                        class="w-full mt-2 border-2 border-gray-300 text-gray-600 font-semibold py-3 px-4 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200">
+                    <i class="fas fa-eraser mr-2"></i>Clear All
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Information Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-info-circle text-blue-500 text-2xl mr-3"></i>
+                <h4 class="font-semibold">Atbash Cipher</h4>
+            </div>
+            <p class="text-sm text-gray-600">A substitution cipher where the alphabet is reversed. A becomes Z, B becomes Y, and so on.</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-info-circle text-green-500 text-2xl mr-3"></i>
+                <h4 class="font-semibold">Caesar Cipher</h4>
+            </div>
+            <p class="text-sm text-gray-600">Shifts each letter by a fixed number of positions in the alphabet. Default shift is 3.</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-info-circle text-purple-500 text-2xl mr-3"></i>
+                <h4 class="font-semibold">Vigenère Cipher</h4>
+            </div>
+            <p class="text-sm text-gray-600">Uses a repeating keyword to shift letters. More secure than simple substitution ciphers.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedCipher = 'atbash';
+let selectedMode = 'encrypt';
+
+function selectCipher(cipher) {
+    selectedCipher = cipher;
+    
+    // Update button styles
+    document.querySelectorAll('.cipher-btn').forEach(btn => {
+        btn.classList.remove('border-purple-500', 'text-purple-600', 'bg-purple-500', 'text-white');
+        btn.classList.add('border-gray-300', 'text-gray-600');
+    });
+    
+    const selectedBtn = document.getElementById(cipher + '-btn');
+    selectedBtn.classList.remove('border-gray-300', 'text-gray-600');
+    selectedBtn.classList.add('border-purple-500', 'text-purple-600');
+    
+    // Show/hide parameters
+    document.getElementById('caesar-params').classList.toggle('hidden', cipher !== 'caesar');
+    document.getElementById('vigenere-params').classList.toggle('hidden', cipher !== 'vigenere');
+}
+
+function selectMode(mode) {
+    selectedMode = mode;
+    
+    // Update button styles
+    if (mode === 'encrypt') {
+        document.getElementById('encrypt-btn').classList.add('bg-green-500', 'text-white');
+        document.getElementById('encrypt-btn').classList.remove('border-2', 'border-gray-300', 'text-gray-600');
+        document.getElementById('decrypt-btn').classList.remove('bg-red-500', 'text-white');
+        document.getElementById('decrypt-btn').classList.add('border-2', 'border-gray-300', 'text-gray-600');
+    } else {
+        document.getElementById('decrypt-btn').classList.add('bg-red-500', 'text-white');
+        document.getElementById('decrypt-btn').classList.remove('border-2', 'border-gray-300', 'text-gray-600');
+        document.getElementById('encrypt-btn').classList.remove('bg-green-500', 'text-white');
+        document.getElementById('encrypt-btn').classList.add('border-2', 'border-gray-300', 'text-gray-600');
+    }
+}
+
+async function processCipher() {
+    const inputText = document.getElementById('inputText').value;
+    
+    if (!inputText) {
+        alert('Please enter some text to process');
+        return;
+    }
+    
+    const data = {
+        text: inputText,
+        cipher_type: selectedCipher,
+        mode: selectedMode,
+        shift: parseInt(document.getElementById('caesarShift').value),
+        key: document.getElementById('vigenereKey').value
+    };
+    
+    try {
+        const response = await fetch('{% url "process_cipher" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            document.getElementById('outputText').value = result.result;
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error processing cipher: ' + error);
+    }
+}
+
+function copyOutput() {
+    const outputText = document.getElementById('outputText');
+    outputText.select();
+    document.execCommand('copy');
+    
+    // Show feedback
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check mr-2"></i>Copied!';
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+    }, 2000);
+}
+
+function clearAll() {
+    document.getElementById('inputText').value = '';
+    document.getElementById('outputText').value = '';
+}
+</script>
+{% endblock %}

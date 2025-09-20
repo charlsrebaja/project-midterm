@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Email Recipient - Security System{% endblock %}
+
+{% block page_title %}Add Email Recipient{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                <i class="fas fa-envelope text-blue-600 text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">Add Email Recipient</h2>
+            <p class="text-gray-600 mt-2">Add a new recipient for automated joke emails</p>
+        </div>
+        
+        <form method="POST" action="{% url 'add_email_recipient' %}">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-user mr-1"></i> Name
+                    </label>
+                    <input type="text" 
+                           name="name" 
+                           id="name" 
+                           required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="John Doe">
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-envelope mr-1"></i> Email Address
+                    </label>
+                    <input type="email" 
+                           name="email" 
+                           id="email" 
+                           required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="john@example.com">
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button type="submit" class="flex-1 bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
+                        <i class="fas fa-plus-circle mr-2"></i>Add Recipient
+                    </button>
+                    <a href="{% url 'automation_dashboard' %}" class="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 text-center">
+                        <i class="fas fa-arrow-left mr-2"></i>Cancel
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Security System{% endblock %}
+
+{% block auth_content %}
+<div class="w-full max-w-md">
+    <div class="glass rounded-2xl shadow-2xl p-8">
+        <!-- Logo and Title -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 to-teal-600 rounded-full mb-4">
+                <i class="fas fa-user-plus text-white text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800">Create Account</h1>
+            <p class="text-gray-600 mt-2">Join our secure system</p>
+        </div>
+        
+        <!-- Registration Form -->
+        <form method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                <!-- Username Field -->
+                <div>
+                    <label for="id_username" class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-user mr-1"></i> Username
+                    </label>
+                    {{ form.username }}
+                    <p class="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
+                    {% if form.username.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Email Field -->
+                <div>
+                    <label for="id_email" class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-envelope mr-1"></i> Email
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Password Field -->
+                <div>
+                    <label for="id_password1" class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-lock mr-1"></i> Password
+                    </label>
+                    {{ form.password1 }}
+                    <div class="mt-2 space-y-1">
+                        <p class="text-xs text-gray-500 flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-1"></i> At least 8 characters
+                        </p>
+                        <p class="text-xs text-gray-500 flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-1"></i> Include letters and numbers
+                        </p>
+                        <p class="text-xs text-gray-500 flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-1"></i> Include special characters (!@#$%^&*)
+                        </p>
+                    </div>
+                    {% if form.password1.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Confirm Password Field -->
+                <div>
+                    <label for="id_password2" class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-lock mr-1"></i> Confirm Password
+                    </label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Phone Number Field (Optional) -->
+                <div>
+                    <label for="id_phone_number" class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-phone mr-1"></i> Phone Number (Optional)
+                    </label>
+                    {{ form.phone_number }}
+                    <p class="text-xs text-gray-500 mt-1">For SMS notifications</p>
+                    {% if form.phone_number.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.phone_number.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Terms and Conditions -->
+                <div class="flex items-start">
+                    <input type="checkbox" required class="mt-1 rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                    <label class="ml-2 text-sm text-gray-600">
+                        I agree to the <a href="#" class="text-blue-600 hover:underline">Terms and Conditions</a> and <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-teal-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-green-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02]">
+                    <i class="fas fa-user-plus mr-2"></i> Create Account
+                </button>
+            </div>
+        </form>
+        
+        <!-- Divider -->
+        <div class="relative my-6">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-white text-gray-500">Already have an account?</span>
+            </div>
+        </div>
+        
+        <!-- Login Link -->
+        <div class="text-center">
+            <a href="{% url 'login' %}" class="inline-flex items-center justify-center w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
+                <i class="fas fa-sign-in-alt mr-2"></i> Sign In Instead
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

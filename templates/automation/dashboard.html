@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}Automation Dashboard - Security System{% endblock %}
+
+{% block page_title %}Automation Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-500 to-teal-500 rounded-xl shadow-lg p-6 text-white mb-8">
+        <h2 class="text-2xl font-bold mb-2">Automation & Scheduling</h2>
+        <p class="opacity-90">Manage automated joke delivery via email and SMS</p>
+    </div>
+    
+    <!-- Manual Trigger Buttons -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <button onclick="triggerEmailTask()" class="bg-blue-500 text-white font-semibold py-4 px-6 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center">
+            <i class="fas fa-envelope mr-3 text-xl"></i>
+            <div class="text-left">
+                <div class="font-bold">Send Joke Emails Now</div>
+                <div class="text-sm opacity-90">Manually trigger email task</div>
+            </div>
+        </button>
+        
+        <button onclick="triggerJokeAPI()" class="bg-green-500 text-white font-semibold py-4 px-6 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center">
+            <i class="fas fa-laugh-beam mr-3 text-xl"></i>
+            <div class="text-left">
+                <div class="font-bold">Get Random Joke</div>
+                <div class="text-sm opacity-90">Fetch joke from API</div>
+            </div>
+        </button>
+    </div>
+    
+    <!-- Schedule Information -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h3 class="text-xl font-semibold mb-4">Automated Schedule</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-center p-4 bg-blue-50 rounded-lg">
+                <i class="fas fa-clock text-blue-500 text-2xl mr-3"></i>
+                <div>
+                    <p class="text-sm text-gray-600">Daily Emails</p>
+                    <p class="font-semibold">9:00 AM</p>
+                </div>
+            </div>
+            <div class="flex items-center p-4 bg-green-50 rounded-lg">
+                <i class="fas fa-broom text-green-500 text-2xl mr-3"></i>
+                <div>
+                    <p class="text-sm text-gray-600">Session Cleanup</p>
+                    <p class="font-semibold">Monday 2:00 AM</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recipients Management -->
+    <div class="grid grid-cols-1 gap-8">
+        <!-- Email Recipients -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold">Email Recipients</h3>
+                <a href="{% url 'add_email_recipient' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Add
+                </a>
+            </div>
+            
+            {% if email_recipients %}
+            <div class="space-y-3">
+                {% for recipient in email_recipients %}
+                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg {% if not recipient.is_active %}opacity-50{% endif %}">
+                    <div class="flex items-center">
+                        <i class="fas fa-user-circle text-gray-400 text-2xl mr-3"></i>
+                        <div>
+                            <p class="font-medium">{{ recipient.name }}</p>
+                            <p class="text-sm text-gray-600">{{ recipient.email }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <a href="{% url 'toggle_recipient' 'email' recipient.id %}" 
+                           class="{% if recipient.is_active %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-700{% endif %} px-3 py-1 rounded-full text-sm hover:opacity-80 transition-opacity">
+                            {% if recipient.is_active %}Active{% else %}Inactive{% endif %}
+                        </a>
+                        <a href="{% url 'delete_recipient' 'email' recipient.id %}" 
+                           onclick="return confirm('Delete this recipient?')"
+                           class="text-red-600 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-inbox text-4xl mb-3"></i>
+                <p>No email recipients yet</p>
+                <a href="{% url 'add_email_recipient' %}" class="text-blue-500 hover:underline mt-2 inline-block">Add your first recipient</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Info Box -->
+    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
+        <h4 class="font-semibold text-blue-800 mb-2">
+            <i class="fas fa-info-circle mr-2"></i>How Automation Works
+        </h4>
+        <div class="text-sm text-blue-700">
+            <p class="font-medium mb-1">Email Automation:</p>
+            <ul class="space-y-1">
+                <li>• Fetches a random joke from JokeAPI</li>
+                <li>• Encrypts with all three cipher methods</li>
+                <li>• Sends formatted email to all active recipients</li>
+                <li>• Runs daily at 9:00 AM automatically</li>
+                <li>• Can be triggered manually with the button above</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300">
+    <i class="fas fa-check-circle mr-2"></i>
+    <span id="toastMessage">Task triggered successfully!</span>
+</div>
+
+<!-- Joke Modal -->
+<div id="jokeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl p-6 max-w-lg w-full mx-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-800">Random Joke</h3>
+            <button onclick="closeJokeModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mb-4">
+            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mb-2" id="jokeCategory">Category</span>
+            <p id="jokeText" class="text-gray-700 text-lg"></p>
+        </div>
+        <div class="flex justify-end">
+            <button onclick="closeJokeModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+async function triggerEmailTask() {
+    try {
+        const response = await fetch('{% url "trigger_email_task" %}');
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Email task triggered successfully!');
+        } else {
+            showToast('Error: ' + data.error, true);
+        }
+    } catch (error) {
+        showToast('Error triggering task', true);
+    }
+}
+
+
+async function triggerJokeAPI() {
+    try {
+        console.log('Fetching joke from API...');
+        
+        // Add a visible notification
+        showToast('Fetching joke from API...', false);
+        
+        // Use direct URL instead of Django template tag
+        const response = await fetch('/automation/trigger-joke/');
+        console.log('Response received:', response);
+        
+        if (!response.ok) {
+            console.error('Response not OK:', response.status, response.statusText);
+            showToast('Error: ' + response.status + ' ' + response.statusText, true);
+            return;
+        }
+        
+        const data = await response.json();
+        console.log('Data received:', data);
+        
+        if (data.success) {
+            // Display joke in modal
+            console.log('Joke received:', data.joke);
+            document.getElementById('jokeText').textContent = data.joke;
+            document.getElementById('jokeCategory').textContent = data.category;
+            document.getElementById('jokeModal').classList.remove('hidden');
+            showToast('Joke fetched successfully!', false);
+        } else {
+            console.error('Error from API:', data.error);
+            showToast('Error: ' + data.error, true);
+        }
+    } catch (error) {
+        console.error('Error fetching joke:', error);
+        showToast('Error fetching joke: ' + error.message, true);
+    }
+}
+
+function closeJokeModal() {
+    document.getElementById('jokeModal').classList.add('hidden');
+}
+
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    
+    toastMessage.textContent = message;
+    
+    if (isError) {
+        toast.classList.remove('bg-green-500');
+        toast.classList.add('bg-red-500');
+    } else {
+        toast.classList.remove('bg-red-500');
+        toast.classList.add('bg-green-500');
+    }
+    
+    toast.classList.remove('hidden');
+    toast.classList.add('translate-y-0');
+    
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 3000);
+}
+</script>
+{% endblock %}
