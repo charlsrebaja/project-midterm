@@ -4,6 +4,10 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .utils import CipherUtils
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from rest_framework.decorators import api_view
+from .serializers import CipherRequestSerializer, CipherResponseSerializer
 
 
 @login_required
@@ -12,6 +16,18 @@ def cipher_tools_view(request):
     return render(request, 'ciphers/cipher_tools.html')
 
 
+@swagger_auto_schema(
+    method='post',
+    request_body=CipherRequestSerializer,
+    operation_description="Process text with specified cipher algorithm",
+    responses={
+        200: CipherResponseSerializer,
+        400: "Bad Request",
+        500: "Internal Server Error"
+    },
+    tags=['ciphers']
+)
+@api_view(['POST'])
 @login_required
 @csrf_exempt
 def process_cipher(request):

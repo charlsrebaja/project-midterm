@@ -1,0 +1,231 @@
+openapi: 3.0.0
+info:
+  title: Security System API
+  description: |
+    API documentation for Security System project.
+    
+    This documentation covers the following APIs:
+    
+    1. Joke API - Fetch random jokes and generate QR codes
+    2. Cipher API - Process text with various cipher algorithms
+    3. Automation API - Trigger email tasks and joke fetching
+  version: 1.0.0
+  contact:
+    email: contact@securitysystem.local
+  license:
+    name: BSD License
+    url: https://opensource.org/licenses/BSD-3-Clause
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+tags:
+  - name: jokes
+    description: Joke API endpoints
+  - name: ciphers
+    description: Cipher API endpoints
+  - name: automation
+    description: Automation API endpoints
+
+paths:
+  /jokes/fetch/:
+    get:
+      tags:
+        - jokes
+      summary: Fetch a random joke
+      description: Fetch a random joke from JokeAPI with QR code generation
+      operationId: fetchJoke
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JokeResponse'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+      security:
+        - basicAuth: []
+
+  /ciphers/process/:
+    post:
+      tags:
+        - ciphers
+      summary: Process text with cipher
+      description: Process text with specified cipher algorithm
+      operationId: processCipher
+      requestBody:
+        description: Cipher request parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CipherRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CipherResponse'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+      security:
+        - basicAuth: []
+
+  /automation/trigger-email/:
+    get:
+      tags:
+        - automation
+      summary: Trigger email task
+      description: Manually trigger email sending task
+      operationId: triggerEmailTask
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTaskResponse'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+      security:
+        - basicAuth: []
+
+  /automation/trigger-joke/:
+    get:
+      tags:
+        - automation
+      summary: Trigger joke API
+      description: Manually fetch a joke from the JokeAPI
+      operationId: triggerJokeApi
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JokeAPIResponse'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+      security:
+        - basicAuth: []
+
+components:
+  schemas:
+    JokeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        joke:
+          type: string
+        category:
+          type: string
+        encrypted:
+          type: object
+          properties:
+            atbash:
+              type: string
+            caesar:
+              type: string
+            vigenere:
+              type: string
+        qr_codes:
+          type: object
+          properties:
+            original:
+              type: string
+              format: uri
+            atbash:
+              type: string
+              format: uri
+            caesar:
+              type: string
+              format: uri
+            vigenere:
+              type: string
+              format: uri
+        error:
+          type: string
+
+    CipherRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          description: Text to encrypt/decrypt
+        cipher_type:
+          type: string
+          enum: [atbash, caesar, vigenere]
+          default: caesar
+          description: Type of cipher to use
+        mode:
+          type: string
+          enum: [encrypt, decrypt]
+          default: encrypt
+          description: Whether to encrypt or decrypt the text
+        shift:
+          type: integer
+          default: 3
+          description: Shift value for Caesar cipher
+        key:
+          type: string
+          default: KEY
+          description: Key for Vigenere cipher
+
+    CipherResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        result:
+          type: string
+        original:
+          type: string
+        cipher_type:
+          type: string
+        mode:
+          type: string
+        error:
+          type: string
+
+    EmailTaskResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        result:
+          type: string
+        error:
+          type: string
+
+    JokeAPIResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        joke:
+          type: string
+        category:
+          type: string
+        error:
+          type: string
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic

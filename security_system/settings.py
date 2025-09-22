@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_totp',
     'crispy_forms',
     'crispy_tailwind',
+    'rest_framework',
+    'drf_yasg',
     
     # Our apps
     'auth_app',
@@ -192,3 +194,32 @@ AUTH_USER_MODEL = 'auth_app.User'
 
 # OTP Settings for 2FA
 OTP_TOTP_ISSUER = 'Security System'
+
+# REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Changed from IsAuthenticated to AllowAny for testing
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+}
+
+# Swagger settings
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Basic': {
+            'type': 'basic'
+        },
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+    'USE_SESSION_AUTH': True,
+    'JSON_EDITOR': True,
+    'VALIDATOR_URL': None,
+}

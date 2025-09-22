@@ -11,6 +11,9 @@ from django.urls import reverse
 from django.contrib import messages
 from auth_app.views import dashboard_view, homepage_view
 
+# Import Swagger URL patterns
+from .swagger import urlpatterns as swagger_urls
+
 # Custom logout view
 def logout_view(request):
     logout(request)
@@ -27,6 +30,9 @@ urlpatterns = [
     path('automation/', include('automation.urls')),
     path('auth/logout/', logout_view, name='logout'),  # Custom logout URL
 ]
+
+# Add Swagger URL patterns
+urlpatterns += swagger_urls
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

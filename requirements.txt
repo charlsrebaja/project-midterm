@@ -9,3 +9,9 @@ celery==5.5.3
 redis==6.4.0
 django-crispy-forms==2.4
 crispy-tailwind==1.0.3
+djangorestframework==3.16.1
+drf-yasg==1.21.10
+pyyaml==6.0.2
+uritemplate==4.2.0
+inflection==0.5.1
+pytz==2025.2

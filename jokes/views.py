@@ -6,6 +6,10 @@ import qrcode
 from io import BytesIO
 import base64
 from ciphers.utils import CipherUtils
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from rest_framework.decorators import api_view
+from .serializers import JokeRequestSerializer, JokeResponseSerializer
 
 
 @login_required
@@ -14,6 +18,17 @@ def jokes_dashboard_view(request):
     return render(request, 'jokes/jokes_dashboard.html')
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Fetch a random joke from JokeAPI with QR code generation",
+    responses={
+        200: JokeResponseSerializer,
+        400: "Bad Request",
+        500: "Internal Server Error"
+    },
+    tags=['jokes']
+)
+@api_view(['GET'])
 @login_required
 def fetch_joke(request):
     """Fetch a random joke from JokeAPI"""

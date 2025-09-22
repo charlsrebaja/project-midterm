@@ -6,6 +6,10 @@ from auth_app.models import EmailRecipient, SMSRecipient
 from .tasks import send_joke_emails, send_joke_sms
 import json
 import requests
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from rest_framework.decorators import api_view
+from .serializers import EmailTaskResponseSerializer, JokeAPIResponseSerializer
 
 
 # Temporarily removed login_required for testing
@@ -80,6 +84,17 @@ def delete_recipient(request, recipient_type, recipient_id):
     return redirect('automation_dashboard')
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Manually trigger email sending task",
+    responses={
+        200: EmailTaskResponseSerializer,
+        400: "Bad Request",
+        500: "Internal Server Error"
+    },
+    tags=['automation']
+)
+@api_view(['GET'])
 # Temporarily removed login_required for testing
 def trigger_email_task(request):
     """Manually trigger email sending task"""
@@ -100,6 +115,17 @@ def trigger_email_task(request):
 
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Manually fetch a joke from the JokeAPI",
+    responses={
+        200: JokeAPIResponseSerializer,
+        400: "Bad Request",
+        500: "Internal Server Error"
+    },
+    tags=['automation']
+)
+@api_view(['GET'])
 # Temporarily removed login_required for testing
 def trigger_joke_api(request):
     """Manually fetch a joke from the API and return it"""
